@@ -28,8 +28,8 @@ int main(int argc, char** argv)
 
     // Simple list for handling multiple -H command-line options
     int hValueCount = 0;
-    char* hvalueList[MAX_H_OPTIONS];
-    memset(hvalueList, 0, sizeof(hvalueList));
+    char* hValueList[MAX_H_OPTIONS];
+    memset(hValueList, 0, sizeof(hValueList));
 
     int nIntValue = DEFAULT_ITERATIONS, sIntValue = DEFAULT_INTERVAL;
 
@@ -39,7 +39,7 @@ int main(int argc, char** argv)
         switch(c)
         {
             case 'H':
-                hvalueList[hValueCount++ % MAX_H_OPTIONS] = strdup(optarg);
+                hValueList[hValueCount++ % MAX_H_OPTIONS] = strdup(optarg);
                 break;
             case 'n':
                 nvalue = strdup(optarg);
@@ -69,6 +69,7 @@ int main(int argc, char** argv)
     HTTPTestDescription testDescription;
     testDescription.iterations = nIntValue;
     testDescription.secondsBwConsecutiveReqs = sIntValue;
+    testDescription.hValueList = hValueList;
     testDescription.onSuccess = onSuccessCallback;
     testDescription.onFailure = onFailCallback;
     testDescription.metricsMask =
@@ -89,8 +90,8 @@ int main(int argc, char** argv)
 
     for (int i = 0; i < MAX_H_OPTIONS; ++i )
     {
-        if (hvalueList[i])
-            free(hvalueList[i]);
+        if (hValueList[i])
+            free(hValueList[i]);
     }
     if (nvalue)
         free(nvalue);

@@ -33,8 +33,24 @@ int HTTPGetTestImpl(void* handle, HTTPTestDescription desc, double* store, int l
 
     curl_easy_setopt(curl, CURLOPT_URL, desc.url);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+    struct curl_slist *list = NULL;
+    for (int h = 0; h < MAX_H_OPTIONS; h++)
+    {
+        if (desc.hValueList[h])
+        {
+            // FIXME: Do check if it's a pair name : value!!
+            list = curl_slist_append(list, desc.hValueList[h]);
+        }
+    }
+    if (list)
+    {
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+    }
 
     CURLcode res = curl_easy_perform(curl);
+
+    curl_slist_free_all(list);
+
     if (res == CURLE_OK)
     {
         if (desc.onSuccess)

@@ -1,6 +1,9 @@
 #ifndef HTTPSTATS_H
 #define HTTPSTATS_H
 
+// Move these horrible defines somewhere else (central location)
+#define MAX_H_OPTIONS 256
+
 typedef enum
 {
     HTTPSTATS_NAMELOOKUP = 1,
@@ -16,6 +19,7 @@ struct HTTPTestDescription_
     const char* url;
     int iterations;
     int secondsBwConsecutiveReqs;
+    char** hValueList;
 
     // Callbacks
     void (*onSuccess)();

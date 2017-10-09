@@ -68,6 +68,7 @@ int main(int argc, char** argv)
 
     HTTPTestDescription testDescription;
     testDescription.iterations = nIntValue;
+    testDescription.secondsBwConsecutiveReqs = sIntValue;
     testDescription.onSuccess = onSuccessCallback;
     testDescription.onFailure = onFailCallback;
     testDescription.metricsMask =

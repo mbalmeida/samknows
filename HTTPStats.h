@@ -15,6 +15,7 @@ struct HTTPTestDescription_
     unsigned metricsMask;
     const char* url;
     int iterations;
+    int secondsBwConsecutiveReqs;
 
     // Callbacks
     void (*onSuccess)();

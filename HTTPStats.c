@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define MAX_ITEMS 1024
 #define MAX_TESTS 16
@@ -108,6 +109,7 @@ HTTPStatsResult HTTPGetTest(HTTPStats* handle, HTTPTestDescription desc)
                 idx = MAX_ITEMS;
             ctx->workArena[r].measurements[i] = idx;
         }
+        sleep(desc.secondsBwConsecutiveReqs);
     }
 
     free(tmpStorage);

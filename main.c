@@ -84,8 +84,8 @@ int main(int argc, char** argv)
     long retCode;
     HTTPStatsMetrics(handle, ret, storage, &ipAddr, &retCode);
 
-    printf("\n\n\n\n%f %f %f %f %s %ld\n\n\n\n\n\n\n", storage[HTTPSTATS_NAMELOOKUP], storage[HTTPSTATS_CONNECT_TIME],
-           storage[HTTPSTATS_STARTTRANSFER_TIME], storage[HTTPSTATS_TOTAL_TIME], ipAddr, retCode);
+    printf("SKTEST;<%s>;<%ld>;<%f>;<%f>;<%f>;<%f>\n", ipAddr, retCode, storage[HTTPSTATS_NAMELOOKUP], storage[HTTPSTATS_CONNECT_TIME],
+           storage[HTTPSTATS_STARTTRANSFER_TIME], storage[HTTPSTATS_TOTAL_TIME]);
 
     free (storage);
     HTTPStatsDestroy(handle);

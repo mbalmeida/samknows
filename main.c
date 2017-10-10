@@ -75,15 +75,17 @@ int main(int argc, char** argv)
     testDescription.metricsMask =
             HTTPSTATS_NAMELOOKUP | HTTPSTATS_CONNECT_TIME
             | HTTPSTATS_STARTTRANSFER_TIME | HTTPSTATS_TOTAL_TIME;
-    testDescription.url = "http://google.com";
+    testDescription.url = "http://www.google.com/";
     HTTPStatsResult ret = HTTPGetTest(handle, testDescription);
 
     double* storage = (double*)malloc(sizeof(double) * HTTPSTATS_MAX_METRICS);
 
-    HTTPStatsMetrics(handle, ret, storage);
+    char* ipAddr;
+    long retCode;
+    HTTPStatsMetrics(handle, ret, storage, &ipAddr, &retCode);
 
-    printf("%f %f %f %f\n", storage[HTTPSTATS_NAMELOOKUP], storage[HTTPSTATS_CONNECT_TIME],
-           storage[HTTPSTATS_STARTTRANSFER_TIME], storage[HTTPSTATS_TOTAL_TIME]);
+    printf("\n\n\n\n%f %f %f %f %s %ld\n\n\n\n\n\n\n", storage[HTTPSTATS_NAMELOOKUP], storage[HTTPSTATS_CONNECT_TIME],
+           storage[HTTPSTATS_STARTTRANSFER_TIME], storage[HTTPSTATS_TOTAL_TIME], ipAddr, retCode);
 
     free (storage);
     HTTPStatsDestroy(handle);

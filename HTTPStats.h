@@ -47,7 +47,8 @@ void* HTTPStatsInitImpl();
  */
 void HTTPStatsDestroyImpl(void* handle);
 
-int HTTPGetTestImpl(void* handle, HTTPTestDescription desc, double* store, int length);
+int HTTPGetTestImpl(void* handle, HTTPTestDescription desc, double* store, char* ipAddr,
+                    long* retCode);
 
 /**
  *
@@ -81,6 +82,6 @@ void HTTPStatsReset(HTTPStats* handle);
 
 
 void HTTPStatsMetrics(HTTPStats* handle, HTTPStatsResult result,
-                      double* computedValues);
+                      double* computedValues, char** ipAddress, long* retCode);
 
 #endif //HTTPSTATS_H

@@ -2,6 +2,7 @@
 
 #include <curl/curl.h>
 #include <stdlib.h>
+#include <string.h>
 
 size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -25,7 +26,7 @@ void HTTPStatsDestroyImpl(void* handle)
     curl_easy_cleanup(curl);
 }
 
-int HTTPGetTestImpl(void* handle, HTTPTestDescription desc, double* store, int length)
+int HTTPGetTestImpl(void* handle, HTTPTestDescription desc, double* store, char* ipAddr, long* retCode)
 {
     CURL* curl = (CURL*)handle;
     if (!curl)
@@ -33,6 +34,7 @@ int HTTPGetTestImpl(void* handle, HTTPTestDescription desc, double* store, int l
 
     curl_easy_setopt(curl, CURLOPT_URL, desc.url);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
     struct curl_slist *list = NULL;
     for (int h = 0; h < MAX_H_OPTIONS; h++)
     {
@@ -80,6 +82,13 @@ int HTTPGetTestImpl(void* handle, HTTPTestDescription desc, double* store, int l
             curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &val);
             store[HTTPSTATS_TOTAL_TIME] = val;
         }
+
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, retCode);
+
+        char* ip;
+        curl_easy_getinfo(curl, CURLINFO_PRIMARY_IP, &ip);
+        if (ip)
+            memcpy(ipAddr, ip, sizeof(char) * strlen(ip) + 1);
 
     }
     else

@@ -13,6 +13,8 @@ typedef struct
     double results[HTTPSTATS_MAX_METRICS][MAX_ITEMS];
     int measurements[HTTPSTATS_MAX_METRICS];
     unsigned requestedMetrics;
+    char* ipAddr;
+    long httpRetCode;
 } HTTPStatsResult_;
 
 typedef struct
@@ -46,6 +48,11 @@ void HTTPStatsReset(HTTPStats* handle)
     {
         HTTPStatsContext* ctx = (HTTPStatsContext*)handle;
         ctx->nrCurrentResults = 0;
+        for (int i = 0; i < MAX_TESTS; ++i)
+        {
+            if (ctx->workArena[i].ipAddr)
+                free (ctx->workArena[i].ipAddr);
+        }
         memset(&ctx->workArena, 0, sizeof(HTTPStatsResult_));
     }
 }
@@ -55,7 +62,7 @@ int cmpfunc (const void * a, const void * b) {
 }
 
 void HTTPStatsMetrics(HTTPStats* handle, HTTPStatsResult result,
-                      double* computedValues)
+                      double* computedValues, char** ipAddr, long* retCode)
 {
     if (!handle)
         return;
@@ -73,6 +80,8 @@ void HTTPStatsMetrics(HTTPStats* handle, HTTPStatsResult result,
               cmpfunc);
         computedValues[i] = ctx->workArena[result].results[i][ctx->workArena[result].measurements[i] / 2];
     }
+    *ipAddr = ctx->workArena[result].ipAddr;
+    *retCode = ctx->workArena[result].httpRetCode;
 }
 
 HTTPStatsResult HTTPGetTest(HTTPStats* handle, HTTPTestDescription desc)
@@ -90,10 +99,19 @@ HTTPStatsResult HTTPGetTest(HTTPStats* handle, HTTPTestDescription desc)
 
     for (int it = 0; it < desc.iterations; it++)
     {
-        int ret = HTTPGetTestImpl(ctx->implementationHandle, desc, tmpStorage, HTTPSTATS_MAX_METRICS);
+        long httpRetCode = 0;
+        char ipAddr[96];
+        memset(&ipAddr, 0, sizeof(ipAddr));
+
+
+        int ret = HTTPGetTestImpl(ctx->implementationHandle, desc, tmpStorage,
+                                  ipAddr, &httpRetCode);
+
         if (ret)
             continue;
 
+        ctx->workArena[r].httpRetCode = httpRetCode;
+        ctx->workArena[r].ipAddr = strdup(ipAddr);
         // Test completed successfully, copy results to our main storage
         for (unsigned i = HTTPSTATS_MAX_METRICS >> 1; i != 0; i >>= 1)
         {
@@ -110,6 +128,7 @@ HTTPStatsResult HTTPGetTest(HTTPStats* handle, HTTPTestDescription desc)
             ctx->workArena[r].measurements[i] = idx;
         }
         sleep(desc.secondsBwConsecutiveReqs);
+
     }
 
     free(tmpStorage);
